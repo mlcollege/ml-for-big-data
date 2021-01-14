@@ -37,7 +37,7 @@ The aim of this course is to present an overview of tools and concepts from mach
 - Worked as a data scientist / data engineer / ML engineer / software developer / devops for the last 10 years in startups / corporates / academy / consulting
 - A *generalist*: “A person with a wide array of knowledge on a variety of subjects, useful or not”
 - Loves math (probability and mathematical analysis in particular), but is pretty bad at it
-- Advocate of simplicity and believer that even *a small data can go a long way* (aneb “*I s malými daty se dá hrát velké divadlo*”)
+- Advocate of simplicity and believer that even *a small data can go a long way* (“*I s malými daty se dá hrát velké divadlo*”)
 # Overview of Big Data concepts and tools
 ## Are you ready for ML on big data?
 ![https://hackernoon.com/the-ai-hierarchy-of-needs-18f111fcc007](https://paper-attachments.dropbox.com/s_86CFF5479D5C05A018B2538409D8E30C1596B9FEC4E9972D3F9F51C0771A30C2_1586158742368_image.png)
@@ -159,7 +159,7 @@ https://colab.research.google.com/drive/1mX9OJd7fCa2eGJN4A4xYkdE-USqYyKr0
 - **In-memory processing**
 - Spark ecosystem - SQL, DataFrames, Streaming, GraphX, MLLib
 - supports Scala, Java, Python and R
-- Version 3.0.0 in beta, 2.5.4 is stable (3.0.0 provides performance enhancements, but the API is almost the same)
+- Version 3.0.1 and 2.5.4 are stable (3.x.x provides performance enhancements, but the API is almost the same)
 
 Even though Spark promises to be fast, there’s still overhead compared to well written parallelized ETL script. The biggest advantage is that it’s a universal tool for almost all big data needs.
 
@@ -248,7 +248,7 @@ Even though Spark promises to be fast, there’s still overhead compared to well
 
 ----------
 ## DataFrames
-![What is Resilient Distributed Dataset?](https://databricks.com/wp-content/uploads/2018/05/rdd-1024x595.png)
+![Spark structures](https://i.stack.imgur.com/3rF6p.png)
 
 - **DataFrame** is a 2-dimensional **labeled data structure** with columns of potentially different types. You can think of it like a spreadsheet or SQL table
 - DataFrames in Spark are an effective way for working with **structured data**
@@ -289,11 +289,6 @@ Even though Spark promises to be fast, there’s still overhead compared to well
 - Choose between memory optimized and CPU optimized instances based on what is the bottleneck
 
 
-----------
-## Running Spark ML model in production
-- Serving trained models in production has high overhead since we have to create Spark context and Spark DataFrame for prediction
-- https://mleap-docs.combust.ml/ promises single-digit ms latency (pure Spark has ~50ms overhead at the time of writing), but it’s not up to date with all transformers
-- https://www.mlflow.org/ or Sagemaker can be used for easy managing & serving models with MLeap or Spark
 ----------
 ## Most common Spark mistakes
 
@@ -345,6 +340,11 @@ https://colab.research.google.com/drive/1gF_v3p_KyArAfiimqhpJ09ySTpDDtlzs
 # ML strategies for Big Data
 ----------
 ## Incremental learning
+![](http://rasbt.github.io/mlxtend/user_guide/general_concepts/gradient-optimization_files/ball.png)
+
+
+[http://rasbt.github.io/mlxtend/user_guide/general_concepts/gradient-optimization_files/ball.png](http://rasbt.github.io/mlxtend/user_guide/general_concepts/gradient-optimization_files/ball.png)
+
 - Some algorithms don’t need to see all training examples at once and can be trained incrementaly on small batches of data
 - **Gradient descent** is an optimization method for finding local minima of differentiable loss functions
 - For example linear regression minimizes loss function $$J(\beta) = \frac{1}{2} \sum_{x_i} (y_i - \beta x_i)^2$$ which has a derivative $$\nabla J(\beta) = \sum_{x_i} (y_i - \beta x_i) x_i$$. Then the gradient descent looks like$$\beta_{t+1} = \beta_{t} - \gamma \nabla J(\beta_t) = \beta_{t} - \gamma \sum_{x \in batch} (y_i - \beta_t x_i) x_i$$
@@ -450,8 +450,14 @@ Two training strategies:
 - natively supports only generalized linear models and some clustering methods
 - **integration with XGBoost**
 
-**Practical examples**
 
+----------
+## Running Spark ML model in production
+- Serving trained models in production has high overhead since we have to create Spark context and Spark DataFrame for prediction
+- https://mleap-docs.combust.ml/ promises single-digit ms latency (pure Spark has ~50ms overhead at the time of writing), but it’s not up to date with all transformers
+- https://www.mlflow.org/ or Sagemaker can be used for easy managing & serving models with MLeap or Spark
+----------
+## Practical examples
 https://colab.research.google.com/drive/1Wgz1sXd0dBpCgFRN3LmzF4Yhay--y_ji
 
 https://colab.research.google.com/drive/1P19JculqNRAZgX7tsRdMAmUMlJZ4hkAS
@@ -487,4 +493,66 @@ Check notebook with instructions from [Colab notebook](https://colab.research.go
 - [Data size and model capacity](https://colab.research.google.com/drive/1YsebNjMYVaPZLviWGeUJWvbl9aPYX0rk?usp=sharing)
 - [Spark Introduction](https://colab.research.google.com/drive/1il_q6yNLdTtpOv_JUx0pP5pnheYHzldn?usp=sharing)
 - [Spark MLLib](https://colab.research.google.com/drive/1v6Nkd4qV75ZmOjoygqLVckSi0yKVwjOT?usp=sharing)
+
+
+
+# Supplementary materials
+## Workflow orchestration
+
+**Apache Airflow**
+
+- best tool for ETL, has the largest community, good for ML pipelines too
+- non-trivial to setup, but easy to maintain after
+- large number of plugins (kubernetes, clouds, …)
+![](https://miro.medium.com/max/4800/1*w_SwwTYbpmBB9-IATyqP9A.png)
+
+
+**Luigi**
+
+- Python-focused, steeper learning curve than Airflow
+- Steps are classes and each run generates some output (preprocessed data, model, diagnostic report, ...)
+- Easy setup, can be run locally, on server, from code...
+- Parametrization and parallel processing (e.g. task can have parameter `country` and generate one file for each country)
+![](https://res.cloudinary.com/practicaldev/image/fetch/s--pL5uk-vt--/c_limit%2Cf_auto%2Cfl_progressive%2Cq_auto%2Cw_880/https://miro.medium.com/max/2192/1%2AhURwKOAd15U2xEkZeXVrfQ.png)
+
+
+**Metaflow**
+
+> Metaflow is a human-friendly Python/R library that helps scientists and engineers build and manage real-life data science projects. Metaflow was originally developed at Netflix to boost productivity of data scientists who work on a wide variety of projects from classical statistics to state-of-the-art deep learning.
+
+- Works only on AWS
+- Simple and intuitive interface, easy to use by both engineers and data scientists
+- The ability to resume a flow, re-executing all successful steps (great for debugging)
+
+**MLFLow Projects**
+
+- training data preparation exclusively for ML
+- easy to use, but hard to setup more complex pipelines
+
+**Notebooks**
+
+- pioneered by Netflix, notebooks serve as “jobs”
+- notebook parametrization by Papermill, scheduling by Luigi / Airflow
+- easy debugging & monitoring
+
+
+## MLOps
+
+= Productionizing ML models
+
+![](https://www.xenonstack.com/wp-content/uploads/2019/09/mlops-solutions-services-xenonstack.png)
+
+
+**Options?**
+
+- Custom solution
+    - Docker container with trained model saved on disk (or in S3 / HDFS)
+    - FastAPI / Flask for serving predictions
+    - Easiest option, can be just added to existing python REST services
+- Sagemaker (AWS)
+    - hard to setup, not flexible enough to be customized
+    - evolving quickly, good for later phase of the project
+- MLFlow
+    - open-source, not so intuitive
+    - management overhead (do you really need all the features?)
 
